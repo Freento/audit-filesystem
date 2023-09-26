@@ -1,0 +1,33 @@
+@color-incorrect-symlink: #f00;
+
+.freento-auditfilesystem-report-grid {
+    .monospace {
+        font-family: monospace;
+    }
+
+    ul {
+        padding-left: 20px;
+
+        ul {
+            padding-left: 2rem;
+        }
+
+        li {
+            &.directory {
+                list-style-image: url('@{baseDir}Freento_AuditFilesystem/img/folder.svg');
+            }
+
+            &.file {
+                list-style-image: url('@{baseDir}Freento_AuditFilesystem/img/file.svg');
+            }
+
+            &.incorrect {
+                color: @color-incorrect-symlink;
+            }
+
+            &::marker {
+                font-size: 2.5rem;
+            }
+        }
+    }
+}

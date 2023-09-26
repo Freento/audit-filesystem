@@ -1,0 +1,50 @@
+<?php
+
+use Magento\Framework\App\Filesystem\DirectoryList;
+
+/** @var \Freento\AuditFilesystem\Block\Adminhtml\Report $block */
+/** @var Magento\Framework\Escaper $escaper */
+/** @var \Freento\AuditFilesystem\Api\FilesystemRepositoryInterface $filesystemRepo */
+$filesystemRepo = $block->getFilesystemRepository();
+?>
+<div class="freento-auditfilesystem-report-grid report-data">
+    <div class="report-description">
+        <p>
+            <?= $escaper->escapeHtml(__('This report lists parent directories inside the Magento document root.')) ?>
+        </p>
+        <p>
+            <?= $escaper->escapeHtml(
+                __(
+                    '<span class="monospace">/var</span> and <span class="monospace">/pub</span> directories '
+                    . 'normally consume most of disk space, so we additionally list nested directories for these two '
+                    . 'parent directories.'
+                ),
+                ['span']
+            ) ?>
+        </p>
+        <p>
+            <?= $escaper->escapeHtml(
+                __(
+                    'Please monitor this report regularly to observe excessive or too big disk space consumption '
+                    . 'by any directory.'
+                )
+            ) ?>
+        </p>
+    </div>
+    <ul>
+        <?php /** @var \Freento\AuditFilesystem\Api\FilesystemInterface $dir */ ?>
+        <?php foreach ($filesystemRepo->getRootDirList() as $dir): ?>
+            <?= $escaper->escapeHtml($block->renderFile($dir), ['li', 'span']) ?>
+            <?php $basename = $dir->getBaseName() ?>
+            <?php if ($basename === DirectoryList::PUB || $basename === DirectoryList::VAR_DIR): ?>
+                <?php // If outer foreach cycle reaches 'pub' or 'var' folder, then inner cycle outputs their content ?>
+                <ul>
+                    <?php /** @var \Freento\AuditFilesystem\Api\FilesystemInterface $subdir */ ?>
+                    <?php foreach ($filesystemRepo->getSubdirList($basename) as $subdir): ?>
+                        <?= $escaper->escapeHtml($block->renderFile($subdir), ['li', 'span']) ?>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </ul>
+</div>
